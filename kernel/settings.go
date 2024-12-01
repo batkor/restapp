@@ -22,7 +22,7 @@ type field struct {
 	Primary  bool
 	Null     bool
 	Unique   bool
-	index    bool
+	Index    bool
 }
 
 // QueryTableColumn Returns query string for create table column.

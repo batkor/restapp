@@ -48,25 +48,45 @@ func createBundleTable(bundleName string) {
 		log.Fatalf("Not found bundle \"%s\".", bundleName)
 	}
 
-	queryStr := fmt.Sprintf("CREATE TABLE %s.%s (\n", kernel.GetSettings().Database.Schema, bundleName)
-	var queryFieldsArray []string
+	queryCreateTableStr := fmt.Sprintf("CREATE TABLE %s.%s (\n", kernel.GetSettings().Database.Schema, bundleName)
+	var queryColumnsList []string
+	var queryIndexColumnsList []string
 
 	for fieldName, fieldObj := range bundle.Fields {
 		if fieldObj.OwnTable {
 			continue
 		}
 
-		queryFieldsArray = append(queryFieldsArray, fieldObj.QueryTableColumn(fieldName))
+		queryColumnsList = append(queryColumnsList, fieldObj.QueryTableColumn(fieldName))
+
+		if fieldObj.Index {
+			queryIndexColumnsList = append(queryIndexColumnsList, fieldName)
+		}
 	}
 
-	queryStr += strings.Join(queryFieldsArray, ",\n")
-	queryStr += ")"
-	fmt.Println(queryStr)
+	queryCreateTableStr += strings.Join(queryColumnsList, ",\n")
+	queryCreateTableStr += ")"
+	fmt.Println(queryCreateTableStr)
 	fmt.Println(bundle)
-	_, err := kernel.Database().Query(queryStr)
+	_, err := kernel.Database().Query(queryCreateTableStr)
 
 	if err != nil {
 		panic(err)
+	}
+
+	if len(queryIndexColumnsList) > 0 {
+		_, err := kernel.
+			Database().
+			Query(fmt.Sprintf("CREATE INDEX idx_%s ON %s.%s (%s)",
+				bundleName,
+				kernel.GetSettings().Database.Schema,
+				bundleName,
+				strings.Join(queryIndexColumnsList, ","),
+			))
+
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
