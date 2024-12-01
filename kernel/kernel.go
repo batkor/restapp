@@ -6,8 +6,6 @@ import (
 	_ "github.com/lib/pq"
 )
 
-type errHandler func(current []byte)
-
 func Check(e error) {
 	if e != nil {
 		panic(e)
@@ -21,7 +19,7 @@ func Database() *sql.DB {
 
 	db, err := sql.Open("postgres", psqlInfo)
 	Check(err)
-
+	// @todo Need close db connector.
 	//defer func(db *sql.DB) {
 	//	err := db.Close()
 	//	if err != nil {
