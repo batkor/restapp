@@ -1,25 +1,25 @@
-/*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
-	"batkor/restapp/kernel"
 	"batkor/restapp/routes"
-	"github.com/gofiber/fiber/v2"
+	"github.com/gin-gonic/gin"
 	"github.com/spf13/cobra"
 )
 
-// startCmd represents the start command
+// startCmd Run web server.
 var startCmd = &cobra.Command{
 	Use:   "start",
 	Short: "Start the server",
 	Long:  `Run web server.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		app := fiber.New()
-		routes.Register(app)
-
-		err := app.Listen(kernel.GetSettings().Address)
+		routerCollection := gin.Default()
+		routes.UserRoutes(routerCollection)
+		routerCollection.GET("/", func(c *gin.Context) {
+			c.JSON(200, gin.H{
+				"message": "pong",
+			})
+		})
+		err := routerCollection.Run()
 
 		if err != nil {
 			return

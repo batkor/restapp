@@ -1,6 +1,3 @@
-/*
-Copyright © 2024 NAME HERE <EMAIL ADDRESS>
-*/
 package cmd
 
 import (
@@ -8,13 +5,12 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-	"github.com/gofiber/fiber/v2/log"
 	"github.com/spf13/cobra"
 	"strings"
 )
 
 func dropTable(bundleName string) {
-	queryStr := fmt.Sprintf("DROP TABLE %s", bundleName)
+	queryStr := fmt.Sprintf("DROP TABLE \"%s\"", bundleName)
 	_, err := kernel.Database().Query(queryStr)
 
 	if err != nil {
@@ -45,10 +41,13 @@ func createBundleTable(bundleName string) {
 	bundle, ok := kernel.GetSettings().Bundles[bundleName]
 
 	if !ok {
-		log.Fatalf("Not found bundle \"%s\".", bundleName)
+		panic(fmt.Errorf("bundle '%s' not found", bundleName))
 	}
 
-	queryCreateTableStr := fmt.Sprintf("CREATE TABLE %s.%s (\n", kernel.GetSettings().Database.Schema, bundleName)
+	queryCreateTableStr := fmt.Sprintf("CREATE TABLE %s.%s (\n",
+		kernel.GetSettings().Database.Schema,
+		bundleName,
+	)
 	var queryColumnsList []string
 	var queryIndexColumnsList []string
 
@@ -66,8 +65,6 @@ func createBundleTable(bundleName string) {
 
 	queryCreateTableStr += strings.Join(queryColumnsList, ",\n")
 	queryCreateTableStr += ")"
-	fmt.Println(queryCreateTableStr)
-	fmt.Println(bundle)
 	_, err := kernel.Database().Query(queryCreateTableStr)
 
 	if err != nil {
@@ -105,7 +102,7 @@ var initCmd = &cobra.Command{
 				if force {
 					dropTable(bundle)
 				} else {
-					log.Fatalf("Already exists table for bundle \"%s\". Add flag -f for force recreate table.", bundle)
+					panic(fmt.Sprintf("Already exists table for bundle \"%s\". Add flag -f for force recreate table.", bundle))
 				}
 			}
 

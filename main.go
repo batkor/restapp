@@ -1,7 +1,7 @@
 package main
 
 import (
-	"batkor/restapp/cmd"
+	"batkor/restapp/kernel/cmd"
 )
 
 func main() {
