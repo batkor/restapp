@@ -6,15 +6,20 @@ database:
   password: postgres
   dbname: restapp
 bundles:
-  node:
+  user:
     fields:
       id:
         type: serial
         primary: true
-      title:
-        type: text
+        index: true
       created:
         type: timestamp
-      description:
+        index: true
+      login:
         type: text
-        null: true
+        Unique: true
+        index: true
+      email:
+        type: text
+        Unique: true
+        index: true
