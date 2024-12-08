@@ -17,9 +17,12 @@ func UserRoutes(routes *gin.Engine) {
 		})
 	})
 
-	routes.GET("/api/user", func(c *gin.Context) {
+	routes.GET("/api/user/:user", func(c *gin.Context) {
+		User := user.FindById(c.Param("user"))
 		c.JSON(200, gin.H{
-			"message": "api/user",
+			"created": User.Created(),
+			"login":   User.Login(),
+			"email":   User.Email(),
 		})
 	})
 }

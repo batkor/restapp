@@ -1,13 +1,18 @@
 package user
 
 type User struct {
-	id    int
-	login string
-	email string
+	id      int
+	created string
+	login   string
+	email   string
 }
 
 func (u *User) Id() int {
 	return u.id
+}
+
+func (u *User) Created() string {
+	return u.created
 }
 
 func (u *User) Email() string {
